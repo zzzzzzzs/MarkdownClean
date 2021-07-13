@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class AppConfig {
 
     public static String[]  searchKeywords;
+    public static Integer mock_count=1000;
     public static final  String[] checkArray(String str){
 
         if(str==null){
