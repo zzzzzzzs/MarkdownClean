@@ -1,1 +1,3 @@
-mock.search.keyword: "图书,小米,iphone11,电视,口红,ps5,苹果手机,小米盒子"
+picPaths: "assets,picture"
+noteRootPath: "C:/Users/simeitol/Desktop/JavaSE基础总结"
+#noteRootPath: "D:/workspace/zs/siyuan/data/MyNotes"
