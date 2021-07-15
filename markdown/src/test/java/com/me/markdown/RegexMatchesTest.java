@@ -16,11 +16,18 @@ public class RegexMatchesTest {
 //        Matcher m = r.matcher(str);
 //        System.out.println(m.matches());
 
-        Pattern pattern1 = Pattern.compile(".*?\\((.*?)\\).*?");
+//        Pattern pattern1 = Pattern.compile(".*?\\((.*?)\\).*?");
+//        Matcher matcher1 = pattern1.matcher("max(A+B)");
+//        if (matcher1.matches()) {
+//            System.out.println(matcher1.group(1));
+//        }
+
+        Pattern pattern1 = Pattern.compile("A");
         Matcher matcher1 = pattern1.matcher("max(A+B)");
         if (matcher1.matches()) {
             System.out.println(matcher1.group(1));
         }
+
 
     }
 }

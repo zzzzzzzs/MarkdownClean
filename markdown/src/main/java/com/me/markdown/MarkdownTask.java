@@ -2,6 +2,7 @@ package com.me.markdown;
 
 import com.me.markdown.config.AppConfig;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -28,7 +29,8 @@ public class MarkdownTask {
     public List<String> realPicPath = new ArrayList<>();
 
     public ArrayList<String> noUsePicPath = new ArrayList<>();
-
+    // 创建存放图片的根目录
+    File movePicRootPathTmp = null;
     // 用来判断图片的后缀
     List<String> picSuffix = new ArrayList<String>() {{
         add("jpg");
@@ -37,10 +39,17 @@ public class MarkdownTask {
 
     // TODO 目前是把所有的图片放在了一个HashSet，这样搜索的性能差，但是实现起来简单，后期再优化
     public void mainTask() {
+        long startTime = System.currentTimeMillis();
+        movePicRootPathTmp = new File(AppConfig.noteRootPath + "Tmp");
+        if (!movePicRootPathTmp.exists()) {
+            movePicRootPathTmp.mkdirs();
+        }
+
         doClean(AppConfig.noteRootPath);
         findNoUsePath();
         movePic();
-        log.info("清理完成");
+        long endTime = System.currentTimeMillis();
+        log.info("用时{}ms清理完成", endTime - startTime);
     }
 
     /**
@@ -49,26 +58,23 @@ public class MarkdownTask {
      * 移动图片的路径
      */
     public void movePic() {
-        // 新的图片存放目录
-        File newPicDir = null;
         for (String ele : noUsePicPath) {
-            int i = ele.lastIndexOf(File.separator);
-            StringBuilder newPath = new StringBuilder();
-            newPath.append(ele.substring(0, i));
-            newPath.append("Tmp");
 
-            newPicDir = new File(String.valueOf(newPath));
-            if (!newPicDir.exists()) {
-                newPicDir.mkdirs();
+            String mvPicFileStr = ele.replace(new File(AppConfig.noteRootPath).getPath(), movePicRootPathTmp.getPath());
+
+            int i = mvPicFileStr.lastIndexOf(File.separator);
+            String movePicDirTmp = mvPicFileStr.substring(0, i);
+            File movePicDirTmpFile = new File(movePicDirTmp);
+            if (!movePicDirTmpFile.exists()) {
+                movePicDirTmpFile.mkdirs();
             }
-            newPath.append(ele.substring(i));
-
-            File file = new File(ele);
-            File newFile = new File(String.valueOf(newPath));
-            if (file.renameTo(newFile)) {
-                log.info("路径" + ele + "移动成功");
+            File oriPicFile = new File(ele);
+            File mvPicFile = new File(mvPicFileStr);
+            // 移动图片
+            if (oriPicFile.renameTo(mvPicFile)) {
+                log.info("路径：" + oriPicFile + " 移动成功");
             }else {
-                log.info("失败");
+                log.info("路径：" + oriPicFile + " 移动失败");
             }
         }
     }
@@ -112,6 +118,7 @@ public class MarkdownTask {
                 } else if (picSuffix.contains(file.getName().substring(file.getName().lastIndexOf(".") + 1))) {
                     // 如果是图片格式的后缀
                     realPicPath.add(file.getAbsolutePath());
+                    log.info("将 {} 加入", file.getAbsolutePath());
                 }
             }
         }
@@ -185,15 +192,16 @@ public class MarkdownTask {
                 + ：出现1次或多次
          */
         // 正则匹配规则
-        String pattern = "!\\[.*\\]\\(.+\\)";
+        String pattern = ".*!\\[.*\\]\\(.+\\).*";
         try {
             fileReader = new FileReader(path);
             bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
+//                log.info(line);
                 // 如果匹配成功
                 if (matcherPic(pattern, line)) {
-//                    log.info(line);
+                    log.info(line);
                     picContexts.add(line);
                 }
             }
