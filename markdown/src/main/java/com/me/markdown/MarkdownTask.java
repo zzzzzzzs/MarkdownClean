@@ -150,7 +150,7 @@ public class MarkdownTask {
     private List<String> parseMdPicContexts(List<String> list) {
         ArrayList<String> parseList = new ArrayList<>();
         // 匹配md文件中图片的内容
-        Pattern pattern = Pattern.compile(".*?\\((.*?)\\).*?");
+        Pattern pattern = Pattern.compile(".*?]\\((.*?)\\).*?");
 
         for (String ele : list) {
             Matcher matcher = pattern.matcher(ele);
