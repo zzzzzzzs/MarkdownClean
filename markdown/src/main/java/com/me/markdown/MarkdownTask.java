@@ -2,7 +2,6 @@ package com.me.markdown;
 
 import com.me.markdown.config.AppConfig;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -38,6 +37,8 @@ public class MarkdownTask {
     }};
 
     // TODO 目前是把所有的图片放在了一个HashSet，这样搜索的性能差，但是实现起来简单，后期再优化
+    // TODO 复杂的模板匹配（包括网页）
+    // TODO　完善的日志
     public void mainTask() {
         long startTime = System.currentTimeMillis();
         movePicRootPathTmp = new File(AppConfig.noteRootPath + "Tmp");
@@ -73,7 +74,7 @@ public class MarkdownTask {
             // 移动图片
             if (oriPicFile.renameTo(mvPicFile)) {
                 log.info("路径：" + oriPicFile + " 移动成功");
-            }else {
+            } else {
                 log.info("路径：" + oriPicFile + " 移动失败");
             }
         }
@@ -103,6 +104,8 @@ public class MarkdownTask {
 
         // 遍历files
         for (File file : files) {
+            String parentFile = file.getParent();
+            String lastFileName = parentFile.substring(parentFile.lastIndexOf(File.separator) + 1);
             // 如果是文件夹
             if (file.isDirectory()) {
                 // 如果是文件夹，则继续执行递归
@@ -115,10 +118,10 @@ public class MarkdownTask {
                     parseMdPicContexts.addAll(parseMdPicContexts(mdPicContexts));
                     // 将md中图片的路径保存在HashSet中
                     mdPicPaths.addAll(joinMdPaths(file.getParent(), parseMdPicContexts));
-                } else if (picSuffix.contains(file.getName().substring(file.getName().lastIndexOf(".") + 1))) {
+                } else if (picSuffix.contains(file.getName().substring(file.getName().lastIndexOf(".") + 1)) && AppConfig.picPaths.contains(lastFileName)) {
                     // 如果是图片格式的后缀
                     realPicPath.add(file.getAbsolutePath());
-                    log.info("将 {} 加入", file.getAbsolutePath());
+                    log.info("将 {} 加入真实图片缓存", file.getAbsolutePath());
                 }
             }
         }
@@ -132,6 +135,7 @@ public class MarkdownTask {
     private HashSet<String> joinMdPaths(String path, List<String> list) {
         HashSet<String> set = new HashSet<>();
         for (String ele : list) {
+            // TODO 后期这里需要优化
             String replace = ele.replace("/", "\\");
             set.add(path + File.separator + replace);
         }
@@ -145,13 +149,26 @@ public class MarkdownTask {
      */
     private List<String> parseMdPicContexts(List<String> list) {
         ArrayList<String> parseList = new ArrayList<>();
+        // 匹配md文件中图片的内容
         Pattern pattern = Pattern.compile(".*?\\((.*?)\\).*?");
 
         for (String ele : list) {
             Matcher matcher = pattern.matcher(ele);
             if (matcher.matches()) {
-                parseList.add(matcher.group(1));
+                String ss = matcher.group(1).split(" ")[0];
+                log.info("未解析的md路径为：{}, 原始md内容为：{}",ss, ele);
+                if(ss.substring(0, 2).contains("./")){
+                    String substring = ss.substring(2);
+                    log.info("解析以后的md中图片对应的路径{}", substring);
+                    parseList.add(substring);
+                }else {
+                    log.info("解析以后的md中图片对应的路径{}", ss);
+                    parseList.add(ss);
+                }
             }
+//            if (matcher.matches()) {
+//                parseList.add(matcher.group(1).split(" ")[0]);
+//            }
         }
         return parseList;
     }
@@ -198,10 +215,9 @@ public class MarkdownTask {
             bufferedReader = new BufferedReader(fileReader);
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-//                log.info(line);
                 // 如果匹配成功
                 if (matcherPic(pattern, line)) {
-                    log.info(line);
+                    log.info("md中图片内容：" + line);
                     picContexts.add(line);
                 }
             }

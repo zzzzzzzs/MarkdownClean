@@ -1,4 +1,5 @@
 picPaths: "assets,picture"
 #noteRootPath: "C:/Users/simeitol/Desktop/JavaSE基础总结"
 #noteRootPath: "D:/workspace/zs/siyuan/data/MyNotes"
-noteRootPath: "C:/Users/simeitol/Desktop/Java"
+#noteRootPath: "C:/Users/simeitol/Desktop/Java"
+noteRootPath: "C:/Users/simeitol/Desktop/MyNotes"
