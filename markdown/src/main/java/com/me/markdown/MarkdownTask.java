@@ -8,6 +8,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -41,7 +43,10 @@ public class MarkdownTask {
     // TODO　完善的日志
     public void mainTask() {
         long startTime = System.currentTimeMillis();
-        movePicRootPathTmp = new File(AppConfig.noteRootPath + "Tmp");
+        // 使用时间做图片的路径，为了以后图片找回
+        LocalDateTime dateTime = LocalDateTime.now(); // get the current date and time
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd-HH-mm-ss");
+        movePicRootPathTmp = new File(AppConfig.noteRootPath + dateTime.format(formatter) + "Tmp");
         if (!movePicRootPathTmp.exists()) {
             movePicRootPathTmp.mkdirs();
         }
