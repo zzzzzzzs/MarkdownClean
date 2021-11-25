@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileReader;
+import cn.hutool.core.lang.Filter;
 import cn.hutool.dfa.WordTree;
 import com.me.markdown.config.AppConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +27,17 @@ public class MarkdownTask {
     // 创建存放图片的根目录
     String movePicRootPathTmp;
     // DFA
-    WordTree tree = new WordTree();
+    static WordTree tree = new WordTree();
+
+    static {
+        // 让所有字符都参与计算
+        tree.setCharFilter(character -> true);
+    }
 
     public void mainTask() {
         long startTime = System.currentTimeMillis();
         // 使用时间做图片的路径，为了以后图片找回
-        String date = DateUtil.format(DateTime.now(), "yyyy-MM-dd-hh-mm-ss");
+        String date = DateUtil.format(DateTime.now(), "yyyy-MM-dd-HH-mm-ss");
         movePicRootPathTmp = AppConfig.noteRootPath + date + "Tmp";
         FileUtil.mkdir(movePicRootPathTmp);
         List<File> fileList = FileUtil.loopFiles(AppConfig.noteRootPath);
