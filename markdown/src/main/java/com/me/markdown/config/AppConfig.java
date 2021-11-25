@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -49,7 +50,8 @@ public class AppConfig {
     @Value("${noteRootPath}")
     public void setNoteRootPath(String str) {
         if (str == null) throw new RuntimeException("路径为空");
-        AppConfig.noteRootPath = str;
+        // 修复路径
+        AppConfig.noteRootPath = FileUtil.normalize(str);
     }
 
     @Value("${fileSuffixs}")
