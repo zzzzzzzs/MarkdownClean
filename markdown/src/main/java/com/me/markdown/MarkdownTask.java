@@ -31,7 +31,7 @@ public class MarkdownTask {
     public void mainTask() {
         long startTime = System.currentTimeMillis();
         // 使用时间做图片的路径，为了以后图片找回
-        String date = DateUtil.format(DateTime.now(), "yyyy-mm-dd-hh-mm-ss");
+        String date = DateUtil.format(DateTime.now(), "yyyy-MM-dd-hh-mm-ss");
         movePicRootPathTmp = AppConfig.noteRootPath + date + "Tmp";
         FileUtil.mkdir(movePicRootPathTmp);
         List<File> fileList = FileUtil.loopFiles(AppConfig.noteRootPath);
