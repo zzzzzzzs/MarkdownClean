@@ -72,6 +72,7 @@ public class MarkdownTask {
             String movePath = FileUtil.normalize(entry.getValue()).replaceAll(AppConfig.noteRootPath, movePicRootPathTmp);
             FileUtil.move(FileUtil.file(entry.getValue()), FileUtil.file(movePath), true);
         }
+        log.info("共清理了 {} 张图片", picPaths.size());
         log.info("用时{}ms清理完成", System.currentTimeMillis() - startTime);
     }
 
